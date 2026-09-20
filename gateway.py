@@ -115,8 +115,11 @@ def create_app(config=None, upstream=None):
     @app.get('/',response_class=HTMLResponse)
     async def home():
         return HTMLResponse(home_html(os.getenv('DOWNLOAD_URL',''),any((Path(__file__).parent/'downloads'/name).is_file() for name in ('StudyPilotC-Setup.exe','StudyPilotC.zip'))),headers={
-            'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
+            'Content-Security-Policy': "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'",
             'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'})
+
+    from marketing_routes import install_marketing_routes
+    install_marketing_routes(app)
 
     @app.get('/download')
     async def download():

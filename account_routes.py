@@ -83,6 +83,11 @@ def install_account_routes(app, database):
     async def me(request: Request):
         return response({'account': await run_in_threadpool(store.session, token(request))})
 
+    @app.post('/v1/account/trial')
+    async def trial(request:Request):
+        peer=request.client.host if request.client else 'unknown'
+        return response({'account':await run_in_threadpool(store.start_trial,token(request),peer)})
+
     @app.post('/v1/account/logout')
     async def logout(request: Request):
         value = token(request)

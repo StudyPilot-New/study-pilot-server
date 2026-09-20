@@ -83,3 +83,12 @@ Las pruebas automáticas locales no sustituyen esta comprobación pública. No s
 - Si la clave falla, cambia únicamente `.env` en el servidor y ejecuta `docker compose up -d`; tus amigos conservan sus códigos.
 
 La separación entre cliente y servidor sigue la [guía de autenticación de OpenAI](https://developers.openai.com/api/reference/overview). El despliegue usa [FastAPI](https://fastapi.tiangolo.com/advanced/events/) y [HTTPS automático de Caddy](https://caddyserver.com/docs/automatic-https).
+
+
+## Prueba gratuita · versión 2026.09.20.4
+
+Cada cuenta puede activar una prueba una sola vez desde Mi cuenta. Incluye 20 análisis durante 48 horas desde la activación, sin tarjeta ni cargos automáticos. Los reintentos y correcciones cuentan; una solicitud reservada puede consumir un análisis aunque el proveedor falle. Cerrar sesión o reiniciar el servidor no restablece el cupo.
+
+Protección inicial: hasta 2 activaciones por red al día y 100 análisis gratuitos diarios para todo el servicio. Las cuentas de pago conservan sus límites existentes. Una red universitaria compartida puede alcanzar el límite de activaciones; el administrador puede aprobar acceso individualmente. No se verifica el correo: estos límites reducen el abuso pero no garantizan una prueba por persona.
+
+El contador y la fecha de vencimiento aparecen en Mi cuenta. Al terminar, el usuario elige un plan y el administrador verifica el pago como antes. Las cuentas, pagos y pruebas se conservan en el disco persistente de Render. La guía ilustrada está en /guia.

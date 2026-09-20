@@ -51,11 +51,36 @@ class AccountStore(AccessStore):
             db.execute('INSERT INTO auth_attempts VALUES(?,?,1) ON CONFLICT(bucket,subject) DO UPDATE SET attempts=attempts+1',(bucket,subject))
             db.execute("DELETE FROM auth_attempts WHERE CAST(SUBSTR(bucket,INSTR(bucket,':')+1) AS INTEGER)*CAST(SUBSTR(bucket,1,INSTR(bucket,':')-1) AS INTEGER) < ?",(now-86400,))
 
-    @staticmethod
-    def public_account(row):
+    def public_account(self,row):
+        with self.connect() as db:
+            trial=db.execute('SELECT expires_at,requests,request_limit FROM account_trials WHERE account_id=?',(row['id'],)).fetchone()
+        trial_info=dict(trial) if trial else None
+        if trial_info:trial_info['remaining']=max(0,trial['request_limit']-trial['requests'])
         active=row['status']!='blocked' and (row['access_reason'] in ('manual','paid_lifetime') or
-                    row['access_reason']=='paid' and (row['paid_until'] or 0)>time.time())
-        return {key:row[key] for key in ('id','email','display_name','role','status','access_reason','paid_until')} | {'active':bool(active)}
+                    row['access_reason']=='paid' and (row['paid_until'] or 0)>time.time() or
+                    row['access_reason']=='trial' and trial and trial['expires_at']>time.time() and trial['requests']<trial['request_limit'])
+        return {key:row[key] for key in ('id','email','display_name','role','status','access_reason','paid_until')} | {'active':bool(active),'trial':trial_info}
+
+    def start_trial(self,token,peer):
+        account=self.session(token)
+        if account['status']=='blocked':raise AccessError(403,'Cuenta bloqueada.')
+        with self.connect() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row=db.execute('SELECT * FROM accounts WHERE id=?',(account['id'],)).fetchone()
+            if row['status']=='blocked':raise AccessError(403,'Cuenta bloqueada.')
+            if db.execute('SELECT 1 FROM account_trials WHERE account_id=?',(account['id'],)).fetchone():
+                raise AccessError(409,'Esta cuenta ya activó su prueba gratuita.')
+            if row['access_reason'] in ('manual','paid_lifetime') or row['access_reason']=='paid' and (row['paid_until'] or 0)>time.time():
+                raise AccessError(409,'Tu cuenta ya tiene acceso activo.')
+            day=self.day();digest=self.digest('trial:'+peer)
+            count=db.execute('SELECT claims FROM trial_claims WHERE day=? AND peer_digest=?',(day,digest)).fetchone()
+            if count and count['claims']>=2:raise AccessError(429,'Límite de pruebas gratuitas en esta red. Contacta con el administrador.')
+            db.execute('INSERT INTO trial_claims VALUES(?,?,1) ON CONFLICT(day,peer_digest) DO UPDATE SET claims=claims+1',(day,digest))
+            now=time.time()
+            db.execute('INSERT INTO account_trials(account_id,started_at,expires_at) VALUES(?,?,?)',(account['id'],now,now+48*3600))
+            db.execute("UPDATE accounts SET status='active',access_reason='trial' WHERE id=?",(account['id'],))
+            db.execute("UPDATE users SET active=1 WHERE name=?",('account:'+account['id'],))
+        return self.session(token)
 
     def register(self,email,password,name):
         email=normalized_email(email)

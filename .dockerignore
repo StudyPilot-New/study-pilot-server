@@ -13,3 +13,10 @@
 !manage_access.py
 !portal.py
 !Dockerfile
+
+!landing.html
+!marketing_routes.py
+!guide_visuals.py
+!guide.html
+!site.css
+!site.js

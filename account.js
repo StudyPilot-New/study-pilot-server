@@ -47,6 +47,16 @@ async function refresh() {
   $('access').textContent=account.active ? (account.paid_until ? 'Access active through '+new Date(account.paid_until*1000).toLocaleDateString() : 'Your access is active.') : 'Access pending. You can wait for free approval or choose a paid plan.';
   $('activation').hidden=!account.active; $('server').value=location.origin;
   const permanent=['manual','paid_lifetime'].includes(account.access_reason);
+  const trial=account.trial;
+  $('trialCard').hidden=permanent || account.access_reason==='paid' && account.active;
+  $('startTrial').hidden=!!trial;
+  $('trialProgress').hidden=!trial;
+  if(trial){
+    $('trialProgress').value=trial.remaining;
+    const valid=trial.expires_at*1000>Date.now() && trial.remaining>0;
+    $('trialStatus').textContent=valid ? `${trial.remaining} of ${trial.request_limit} analyses left · Ends ${new Date(trial.expires_at*1000).toLocaleString()}. No automatic charges.` : 'Your trial has ended. Choose a plan to continue; nothing has been charged.';
+    if(account.access_reason==='trial')$('access').textContent=valid?'Free trial active. Download the app and sign in with this account.':'Free trial ended. Choose a plan to continue.';
+  }
   $('purchase').hidden=permanent;
   $('disabled').textContent=config.enabled?'Payment is reviewed by the administrator before access is activated.':'Payments are not available yet. Please wait for the administrator.';
   $('monthly').disabled=$('one_time').disabled=!config.enabled;
@@ -98,6 +108,7 @@ for(const mode of ['login','register'])bind(mode,async()=>{
   const result=await api('/v1/account/'+mode,fields(mode));session=result.access_token;$(mode).reset();await refresh();
 },true);
 bind('refresh',refresh);
+bind('startTrial',async()=>{await api('/v1/account/trial',{});await refresh();message('Trial activated. Download the app, open Mi cuenta and sign in.');});
 bind('logout',async()=>{await api('/v1/account/logout',{});session='';location.reload();});
 bind('copy',async()=>{await navigator.clipboard.writeText(session);message('Private code copied. Paste it only in your desktop app.');});
 for(const plan of ['monthly','one_time'])bind(plan,async()=>{

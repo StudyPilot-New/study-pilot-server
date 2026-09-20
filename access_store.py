@@ -39,6 +39,13 @@ class AccessStore:
                 CREATE TABLE IF NOT EXISTS auth_attempts (
                   bucket TEXT NOT NULL, subject TEXT NOT NULL, attempts INTEGER NOT NULL,
                   PRIMARY KEY(bucket,subject));
+                CREATE TABLE IF NOT EXISTS account_trials (
+                  account_id TEXT PRIMARY KEY, started_at REAL NOT NULL,
+                  expires_at REAL NOT NULL, requests INTEGER NOT NULL DEFAULT 0,
+                  request_limit INTEGER NOT NULL DEFAULT 20);
+                CREATE TABLE IF NOT EXISTS trial_claims (
+                  day TEXT NOT NULL, peer_digest TEXT NOT NULL, claims INTEGER NOT NULL DEFAULT 0,
+                  PRIMARY KEY(day,peer_digest));
             ''')
 
     @contextmanager
@@ -81,10 +88,18 @@ class AccessStore:
                 WHERE s.digest=? AND s.expires_at>?''',(self.digest(token),time.time())).fetchone()
             if row is not None and (row['status']=='blocked' or not (
                     row['access_reason'] in ('manual','paid_lifetime') or
-                    row['access_reason']=='paid' and (row['paid_until'] or 0)>time.time())):
+                    row['access_reason']=='paid' and (row['paid_until'] or 0)>time.time() or
+                    row['access_reason']=='trial' and self.trial_available(db,row['name'][8:]))):
+                if row['access_reason']=='trial' and row['status']!='blocked':
+                    raise AccessError(403,'Tu prueba gratuita terminó. Entra en Mi cuenta en la web para elegir un plan; no se ha cobrado nada automáticamente.')
                 raise AccessError(403,'Tu cuenta todavía no tiene acceso activo.')
         if not row or not row['active']: raise AccessError(401,'Código inválido o revocado. Contacta con el administrador.')
         return {key:row[key] for key in ('name','active','daily_limit')}
+
+    @staticmethod
+    def trial_available(db, account_id):
+        row=db.execute('SELECT expires_at,requests,request_limit FROM account_trials WHERE account_id=?',(account_id,)).fetchone()
+        return bool(row and row['expires_at']>time.time() and row['requests']<row['request_limit'])
 
     def reserve(self, token, global_limit, minute_limit=20, now=None):
         now = time.time() if now is None else now
@@ -93,12 +108,23 @@ class AccessStore:
         with self.connect() as db:
             db.execute('BEGIN IMMEDIATE')
             user = self.authenticate(token,db)
+            trial=False
+            if user['name'].startswith('account:'):
+                account=db.execute('SELECT access_reason FROM accounts WHERE id=?',(user['name'][8:],)).fetchone()
+                trial=bool(account and account['access_reason']=='trial')
+            if trial:
+                count=db.execute("SELECT requests FROM usage WHERE bucket=? AND name='*trial'",(day,)).fetchone()
+                if count and count['requests']>=100:
+                    raise AccessError(429,'La capacidad gratuita de hoy se agotó. Inténtalo mañana; no se descontó este análisis.')
             for bucket,name,limit in ((day,user['name'],user['daily_limit']), (day,'*',global_limit), (minute,user['name'],minute_limit)):
                 count = db.execute('SELECT requests FROM usage WHERE bucket=? AND name=?',(bucket,name)).fetchone()
                 if count and count['requests'] >= limit:
                     raise AccessError(429,'Límite de uso alcanzado. Espera o contacta con el administrador.')
             for bucket,name in ((day,user['name']), (day,'*'), (minute,user['name'])):
                 db.execute('INSERT INTO usage(bucket,name,requests) VALUES(?,?,1) ON CONFLICT(bucket,name) DO UPDATE SET requests=requests+1',(bucket,name))
+            if trial:
+                db.execute('UPDATE account_trials SET requests=requests+1 WHERE account_id=?',(user['name'][8:],))
+                db.execute("INSERT INTO usage(bucket,name,requests) VALUES(?,'*trial',1) ON CONFLICT(bucket,name) DO UPDATE SET requests=requests+1",(day,))
             db.execute("DELETE FROM usage WHERE bucket LIKE 'M:%' AND CAST(SUBSTR(bucket,3) AS INTEGER) < ?",(int(now//60)-2,))
         return user['name'],day
 
