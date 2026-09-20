@@ -9,7 +9,6 @@ services:
     healthCheckPath: /health
     autoDeployTrigger: off
     numInstances: 1
-    maxShutdownDelaySeconds: 90
     disk:
       name: access-data
       mountPath: /var/data
