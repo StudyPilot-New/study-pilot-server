@@ -1,8 +1,11 @@
 {
+  "filename": "StudyPilotC-Setup.exe",
+  "version": "2026.09.20.2",
   "parts": [
     "client.part01",
     "client.part02",
-    "client.part03"
+    "client.part03",
+    "client.part04"
   ],
-  "sha256": "b37ec26dc06c593f16f39577c9e2057139081b1fff157b5cccdb7c483b539bec"
+  "sha256": "59828b8d066b08cde163b2dbdabb8a2d859b249bd7c6570c0c6b55b86f379bdd"
 }

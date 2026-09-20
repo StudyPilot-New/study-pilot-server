@@ -2,7 +2,7 @@
 
 ## Estado de esta entrega
 
-Implementado y probado localmente. No publicado en Render en esta entrega.
+Incluido en la versión 2026.09.20.2. Consulta README.md para instalación y administración.
 Los cobros se encuentran desactivados por defecto. Destinatario propuesto: **$Carluchad**.
 No se inició ninguna transferencia, ni se comprobó que ese perfil sea elegible para recibir ventas.
 
@@ -16,7 +16,7 @@ No se inició ninguna transferencia, ni se comprobó que ese perfil sea elegible
 5. Incluir la referencia de compra en la nota de la transferencia.
 6. En el portal, indicar remitente y referencia de transferencia; pulsar **I paid · Send for review**.
 7. El estado queda **Pending review**. Pulsar **Refresh status** después de la aprobación.
-8. Con acceso activo, abrir **Connect the desktop app** y copiar URL/código privado a la guía del escritorio actual.
+8. Con acceso activo, abrir **Mi cuenta** en la app de escritorio e iniciar sesión con el mismo correo y contraseña.
 
 La mensualidad es de renovación manual: no hay cargos automáticos. Una renovación aprobada añade un mes
 calendario a la fecha vigente, o a la fecha de aprobación si ya venció. El fin de mes se ajusta al último día
