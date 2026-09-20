@@ -22,7 +22,9 @@ def assemble(root=None):
             with path.open('rb') as source:
                 while chunk:=source.read(1024*1024):target.write(chunk);digest.update(chunk)
     if digest.hexdigest()!=spec['sha256']:raise ValueError('Desktop archive verification failed')
-    destination=output/'StudyPilotC.zip';temporary.replace(destination)
+    filename=spec.get('filename','StudyPilotC.zip')
+    if filename not in ('StudyPilotC.zip','StudyPilotC-Setup.exe'):raise ValueError('Unexpected download filename')
+    destination=output/filename;temporary.replace(destination)
     print('Desktop package verified and ready to download.')
     return destination
 

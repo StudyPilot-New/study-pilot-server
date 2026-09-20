@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from portal import home_html
 from openai import AsyncOpenAI
 from access_store import AccessStore, AccessError
+from account_routes import install_account_routes
 
 
 @dataclass
@@ -99,6 +100,7 @@ def create_app(config=None, upstream=None):
 
     app = FastAPI(lifespan=lifespan,docs_url=None,redoc_url=None,openapi_url=None)
     app.state.store = store
+    install_account_routes(app, config.database)
     active = set()
 
     def token_for(request):
@@ -112,15 +114,16 @@ def create_app(config=None, upstream=None):
 
     @app.get('/',response_class=HTMLResponse)
     async def home():
-        return HTMLResponse(home_html(os.getenv('DOWNLOAD_URL',''),(Path(__file__).parent/'downloads/StudyPilotC.zip').is_file()),headers={
+        return HTMLResponse(home_html(os.getenv('DOWNLOAD_URL',''),any((Path(__file__).parent/'downloads'/name).is_file() for name in ('StudyPilotC-Setup.exe','StudyPilotC.zip'))),headers={
             'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
             'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'})
 
     @app.get('/download')
     async def download():
-        package=Path(__file__).parent/'downloads/StudyPilotC.zip'
+        package=Path(__file__).parent/'downloads/StudyPilotC-Setup.exe'
+        if not package.is_file():package=Path(__file__).parent/'downloads/StudyPilotC.zip'
         if not package.is_file():return error(404,'El administrador todavía no publicó el paquete de escritorio.')
-        return FileResponse(package,media_type='application/zip',filename='Study-Pilot-C-Escritorio-Compartido.zip',
+        return FileResponse(package,media_type='application/octet-stream' if package.suffix=='.exe' else 'application/zip',filename=package.name,
                             headers={'X-Content-Type-Options':'nosniff'})
 
     @app.get('/v1/access')

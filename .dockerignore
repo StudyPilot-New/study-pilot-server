@@ -2,6 +2,14 @@
 !requirements.txt
 !gateway.py
 !access_store.py
+!accounts.py
+!account_routes.py
+!plans.py
+!manual_payments.py
+!payment_routes.py
+!account.html
+!account.js
+!account.css
 !manage_access.py
 !portal.py
 !Dockerfile

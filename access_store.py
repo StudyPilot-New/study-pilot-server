@@ -28,6 +28,17 @@ class AccessStore:
                   input_tokens INTEGER NOT NULL DEFAULT 0,
                   output_tokens INTEGER NOT NULL DEFAULT 0,
                   PRIMARY KEY(bucket,name));
+                CREATE TABLE IF NOT EXISTS accounts (
+                  id TEXT PRIMARY KEY, email TEXT UNIQUE NOT NULL, display_name TEXT NOT NULL,
+                  password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'member',
+                  status TEXT NOT NULL DEFAULT 'pending', access_reason TEXT,
+                  paid_until REAL, created_at REAL NOT NULL);
+                CREATE TABLE IF NOT EXISTS account_sessions (
+                  digest TEXT PRIMARY KEY, account_id TEXT NOT NULL,
+                  expires_at REAL NOT NULL, created_at REAL NOT NULL);
+                CREATE TABLE IF NOT EXISTS auth_attempts (
+                  bucket TEXT NOT NULL, subject TEXT NOT NULL, attempts INTEGER NOT NULL,
+                  PRIMARY KEY(bucket,subject));
             ''')
 
     @contextmanager
@@ -63,8 +74,17 @@ class AccessStore:
         if db is None:
             with self.connect() as connection: return self.authenticate(token,connection)
         row = db.execute('SELECT name,active,daily_limit FROM users WHERE digest=?',(self.digest(token),)).fetchone()
+        if row is None:
+            row = db.execute('''SELECT u.name,u.active,u.daily_limit,a.status,a.access_reason,a.paid_until
+                FROM account_sessions s JOIN accounts a ON a.id=s.account_id
+                JOIN users u ON u.name='account:' || a.id
+                WHERE s.digest=? AND s.expires_at>?''',(self.digest(token),time.time())).fetchone()
+            if row is not None and (row['status']=='blocked' or not (
+                    row['access_reason'] in ('manual','paid_lifetime') or
+                    row['access_reason']=='paid' and (row['paid_until'] or 0)>time.time())):
+                raise AccessError(403,'Tu cuenta todavía no tiene acceso activo.')
         if not row or not row['active']: raise AccessError(401,'Código inválido o revocado. Contacta con el administrador.')
-        return dict(row)
+        return {key:row[key] for key in ('name','active','daily_limit')}
 
     def reserve(self, token, global_limit, minute_limit=20, now=None):
         now = time.time() if now is None else now
