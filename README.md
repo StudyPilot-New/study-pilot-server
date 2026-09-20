@@ -1,4 +1,4 @@
-# Study Pilot C · 2026.09.20.2
+# Study Pilot C · 2026.09.20.3
 
 Servicio: https://study-pilot-server.onrender.com
 
@@ -29,3 +29,5 @@ McGraw Hill tiene un adaptador específico. Canvas, Moodle, Blackboard, Pearson 
 `assemble_client.py` une `client.partNN`, verifica SHA256 y crea el instalador indicado en `client-manifest.json`. Sube todas las partes antes de ejecutar Manual Deploy. El despliegue automático está desactivado. No subas `.env`, bases de datos, perfiles de Chrome ni archivos de acceso personales.
 
 Una compilación y las pruebas automatizadas no garantizan una sesión real completa sin errores. El instalador no tiene firma digital de editor y Windows puede mostrar una advertencia de reputación.
+
+Corrección 2026.09.20.3: el estado del inicio de sesión se muestra encima de los campos. Una cuenta activa abre la pestaña Actividad; errores y accesos pendientes permanecen visibles.
