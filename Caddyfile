@@ -1,0 +1,13 @@
+{
+    email {$ACME_EMAIL}
+}
+{$PUBLIC_DOMAIN} {
+    request_body {
+        max_size 12MB
+    }
+    reverse_proxy gateway:8000 {
+        transport http {
+            response_header_timeout 90s
+        }
+    }
+}

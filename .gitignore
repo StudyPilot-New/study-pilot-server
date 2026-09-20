@@ -1,0 +1,6 @@
+.env
+data/
+__pycache__/
+*.log
+*.sqlite3*
+downloads/

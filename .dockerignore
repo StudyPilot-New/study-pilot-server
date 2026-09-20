@@ -1,0 +1,7 @@
+*
+!requirements.txt
+!gateway.py
+!access_store.py
+!manage_access.py
+!portal.py
+!Dockerfile

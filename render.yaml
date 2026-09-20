@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: study-pilot-server
+    runtime: python
+    plan: 0.5c-512mb
+    region: virginia
+    buildCommand: python assemble_client.py && pip install -r requirements.txt
+    startCommand: uvicorn gateway:create_app --factory --host 0.0.0.0 --port $PORT --workers 1 --no-access-log --limit-concurrency 32
+    healthCheckPath: /health
+    autoDeployTrigger: off
+    numInstances: 1
+    maxShutdownDelaySeconds: 90
+    disk:
+      name: access-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-5.6-luna
+      - key: ACCESS_DB
+        value: /var/data/access.sqlite3
+      - key: GLOBAL_DAILY_REQUESTS
+        value: "3000"
+      - key: MAX_CONCURRENT
+        value: "4"
+      - key: PYTHONUNBUFFERED
+        value: "1"

@@ -1,0 +1,8 @@
+{
+  "parts": [
+    "client.part01",
+    "client.part02",
+    "client.part03"
+  ],
+  "sha256": "b37ec26dc06c593f16f39577c9e2057139081b1fff157b5cccdb7c483b539bec"
+}
