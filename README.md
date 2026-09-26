@@ -1,6 +1,12 @@
-# Study Pilot C · 2026.09.20.3
+# Study Pilot C · 2026.09.25.8
 
 Servicio: https://study-pilot-server.onrender.com
+
+## Actualización 2026.09.25.8
+
+Corrige la recuperación de arrastrar y soltar: comprueba la identidad actual de cada pieza, verifica que se soltó y limita los intentos por gesto. Conserva el análisis entre reintentos y evita capturas y recargas repetidas. El diagnóstico local se guarda en la carpeta de datos del usuario.
+
+Para actualizar cualquier instalación anterior, cierra Study Pilot C, descarga de nuevo `/download` y ejecuta el instalador. El acceso directo apunta a la nueva versión; la cuenta, los ajustes y el perfil se conservan. Las versiones ya abiertas no se actualizan desde el servidor.
 
 ## Empezar
 
@@ -30,4 +36,4 @@ McGraw Hill tiene un adaptador específico. Canvas, Moodle, Blackboard, Pearson 
 
 Una compilación y las pruebas automatizadas no garantizan una sesión real completa sin errores. El instalador no tiene firma digital de editor y Windows puede mostrar una advertencia de reputación.
 
-Corrección 2026.09.20.3: el estado del inicio de sesión se muestra encima de los campos. Una cuenta activa abre la pestaña Actividad; errores y accesos pendientes permanecen visibles.
+Corrección 2026.09.20.4: el estado del inicio de sesión se muestra encima de los campos. Una cuenta activa abre la pestaña Actividad; errores y accesos pendientes permanecen visibles.
