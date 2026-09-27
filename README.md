@@ -1,10 +1,12 @@
-# Study Pilot C · 2026.09.25.8
+# Study Pilot C · 2026.09.27.9
 
 Servicio: https://study-pilot-server.onrender.com
 
-## Actualización 2026.09.25.8
+## Actualización 2026.09.27.9
 
-Corrige la recuperación de arrastrar y soltar: comprueba la identidad actual de cada pieza, verifica que se soltó y limita los intentos por gesto. Conserva el análisis entre reintentos y evita capturas y recargas repetidas. El diagnóstico local se guarda en la carpeta de datos del usuario.
+Corrige casos de arrastre con respuesta lenta, piezas flotantes y listas dentro de marcos con desplazamiento. Las copias visuales del arrastre no cuentan como opciones nuevas. Reading conserva la referencia a la actividad cuando abre una ventana o cambia un marco; el regreso espera a que termine la transición.
+
+La recuperación comienza soltando el arrastre y detectando de nuevo los controles, antes de recurrir a recargas limitadas. Las operaciones bloqueadas se cancelan antes del siguiente intento. Se conserva el análisis y la memoria de errores de la sesión. El diagnóstico local se guarda en la carpeta de datos del usuario. Estos casos se verifican con pruebas aisladas del navegador; aún no se ha reproducido la pantalla negra del equipo del usuario ni validado una sesión universitaria completa.
 
 Para actualizar cualquier instalación anterior, cierra Study Pilot C, descarga de nuevo `/download` y ejecuta el instalador. El acceso directo apunta a la nueva versión; la cuenta, los ajustes y el perfil se conservan. Las versiones ya abiertas no se actualizan desde el servidor.
 
