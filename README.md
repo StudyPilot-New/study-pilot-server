@@ -1,6 +1,14 @@
-# Study Pilot C · 2026.09.27.9
+# Study Pilot C · 2026.09.27.10
 
 Servicio: https://study-pilot-server.onrender.com
+
+## Actualización 2026.09.27.10
+
+Canvas utiliza un flujo específico para aplicar respuestas en etiquetas visibles y controles personalizados. Evita contar dos veces la misma opción y conserva la identidad de la pregunta cuando Canvas reconstruye sus controles. Comprueba que la selección se mantiene antes de pulsar Next; los reintentos conservan el análisis y no quedan detenidos indefinidamente tras agotar los primeros intentos. El envío final del cuestionario sigue siendo manual.
+
+Los reintentos atienden por turnos las preguntas pendientes. Una respuesta vacía o de confianza insuficiente solicita revisión automática. El panel permite que los clics alcancen los controles durante la aplicación sin ocultarse ni provocar parpadeos.
+
+Las pruebas incluyen varias preguntas consecutivas, controles ocultos con etiquetas visibles, opciones personalizadas, reemplazo del formulario y Next retrasado. No certifican todas las variantes de Canvas ni una sesión real completa.
 
 ## Actualización 2026.09.27.9
 
