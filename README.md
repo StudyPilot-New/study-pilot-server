@@ -1,6 +1,12 @@
-# Study Pilot C · 2026.09.27.10
+# Study Pilot C · 2026.09.28.11
 
 Servicio: https://study-pilot-server.onrender.com
+
+## Actualización 2026.09.28.11
+
+Corrige tres causas de pausa: Canvas conserva preguntas visibles repetidas sin ID y reconoce más contenedores de opciones, incluidos los que anidan la pregunta y las respuestas; Reading vuelve a la actividad aunque el libro abra en un dominio externo, en una ventana nueva o en un marco que mantenga la URL. Cuando Canvas no expone controles tras varios segundos, la app libera una posible interacción retenida y muestra un estado claro mientras continúa revisando la página.
+
+El instalador conserva la cuenta y los ajustes existentes. La verificación utiliza páginas locales de prueba; no sustituye una prueba de toda la sesión en Canvas o McGraw Hill.
 
 ## Actualización 2026.09.27.10
 
