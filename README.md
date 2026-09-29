@@ -1,6 +1,12 @@
-# Study Pilot C · 2026.09.28.11
+# Study Pilot C · 2026.09.29.12
 
 Servicio: https://study-pilot-server.onrender.com
+
+## Actualización 2026.09.29.12
+
+- Recuperación del lector McGraw cuando su estado de regreso se pierde: detecta el libro, intenta volver y limita las recargas.
+- Preguntas con varias casillas: una respuesta incompleta activa una revisión inmediata enfocada en todas las casillas; los fallos estructurados reintentan en segundos.
+- Una pregunta fallida consulta Reading una sola vez para evitar bucles de apertura.
 
 ## Actualización 2026.09.28.11
 
