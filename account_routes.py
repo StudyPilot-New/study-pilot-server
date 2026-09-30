@@ -37,8 +37,12 @@ def install_account_routes(app, database):
             async for chunk in request.stream():
                 raw.extend(chunk)
                 if len(raw) > 8192: raise AccessError(413, 'Solicitud demasiado grande.')
-        try: data = json.loads(raw)
-        except (ValueError, UnicodeError): raise AccessError(400, 'Revisa los datos enviados.') from None
+        try:
+            data = json.loads(raw)
+            # JSON permits escaped lone surrogates; SQLite and password hashing do not.
+            json.dumps(data, ensure_ascii=False).encode('utf-8')
+        except (ValueError, UnicodeError, RecursionError):
+            raise AccessError(400, 'Revisa los datos enviados.') from None
         if not isinstance(data, dict): raise AccessError(400, 'Revisa los datos enviados.')
         return data
 
@@ -91,7 +95,7 @@ def install_account_routes(app, database):
     @app.post('/v1/account/logout')
     async def logout(request: Request):
         value = token(request)
-        await run_in_threadpool(store.session, value)
+        # Revoking the same bearer twice is safe, including after session expiry.
         await run_in_threadpool(store.logout, value)
         return response({'ok': True})
 

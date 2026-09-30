@@ -33,6 +33,7 @@ def clean_payload(data, config):
         raise ValueError('Formato de solicitud no permitido.')
     instructions = data.get('instructions','')
     if not isinstance(instructions,str) or len(instructions)>16000: raise ValueError('Instrucciones demasiado largas.')
+    instructions.encode('utf-8')
     messages = data.get('input')
     if not isinstance(messages,list) or not 1<=len(messages)<=4: raise ValueError('Contenido no válido.')
     chars, images = 0, 0
@@ -46,6 +47,7 @@ def clean_payload(data, config):
             if not isinstance(part,dict): raise ValueError('Contenido no permitido.')
             if part.get('type')=='input_text':
                 if set(part)-{'type','text'} or not isinstance(part.get('text'),str): raise ValueError('Texto no válido.')
+                part['text'].encode('utf-8')
                 chars += len(part['text'])
                 if chars>48000: raise ValueError('Texto demasiado largo.')
                 parts.append({'type':'input_text','text':part['text']})
@@ -153,7 +155,7 @@ def create_app(config=None, upstream=None):
                         body.extend(chunk)
                         if len(body)>config.body_limit: return error(413,'Solicitud demasiado grande.')
                 try: payload = clean_payload(json.loads(body),config)
-                except (ValueError,TypeError,UnicodeError): return error(400,'Contenido inválido o no compatible con esta aplicación.')
+                except (ValueError,TypeError,UnicodeError,RecursionError): return error(400,'Contenido inválido o no compatible con esta aplicación.')
                 name, day = store.reserve(token,config.daily_limit)
                 try:
                     async with asyncio.timeout(80):
