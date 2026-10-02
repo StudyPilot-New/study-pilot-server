@@ -1,6 +1,14 @@
-# Study Pilot C · 2026.09.29.12
+# Study Pilot C · 2026.10.02.15
 
 Servicio: https://study-pilot-server.onrender.com
+
+## Actualización 2026.10.02.15
+
+- Detecta Session expired con Exit Assignment, además de Exit Recharge. Tras iniciar sesión de nuevo, una pregunta restaurada puede volver a analizarse sin heredar el bloqueo anterior.
+- Reading no disponible ya no bloquea de inmediato una pregunta completa: se permiten revisiones independientes acotadas. Se conserva la protección contra reenvíos de respuestas rechazadas.
+- El diagnóstico conserva eventos de expiración, revisiones agotadas y clases de error de API; los ciclos saludables repetidos se agrupan. No exporta claves, preguntas ni respuestas.
+
+Validación: 255 pruebas de escritorio y 22 autopruebas del cliente extraído del instalador. No se ha ejecutado una actividad universitaria real completa. Una sesión expirada requiere autenticación normal.
 
 ## Actualización 2026.09.29.12
 
